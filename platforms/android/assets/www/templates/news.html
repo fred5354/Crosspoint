@@ -1,0 +1,48 @@
+<ion-view title="講道">
+    <ion-content  overflow-scroll="true" cache-view="false">
+        
+        {{storage}}
+        
+        <div  ng-repeat="new in news">
+        	<div ng-if="0==$index">
+            <a class="screen" href="#/app/feed-categories/{{new.series_title}}">
+                	<img ng-src="{{new.image}}" alt=""> 
+            </a>	
+
+            </div>
+            
+             <ion-list>
+             
+              <a class="item item" href="#/app/feed-categories/{{news[$index].series_slug}}" >
+					{{new.series_title}}
+              </a>
+             
+             </ion-list>
+            
+            <!--
+		   	<div ng-if="$index>0">           
+		           <div  ng-if="$index%2==0" class="row">
+						<div class="col card" style="margin:3px;padding:0px">
+								<a class="screen" href="#/app/feed-categories/{{news[$index].series_title}}">
+								<img ng-src="{{news[$index].image}}" alt=""> 
+								</a>
+						</div>
+
+						<div class="col card"  style="margin:0px;">
+								<a class="screen" href="#/app/feed-categories/{{news[$index+1].series_title}}">
+								<img ng-src="{{news[$index+1].image}}" alt=""> 
+								</a>
+						</div>
+
+					</div> 	
+		            	
+		            	
+		    </div>
+		    -->
+		
+		
+		
+        </div>
+       
+    </ion-content>
+</ion-view>

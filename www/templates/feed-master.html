@@ -1,0 +1,42 @@
+<ion-view title="{{sermon.title}}">
+    <ion-nav-buttons side="right">
+    <a class="button button-clear" ng-click="shareSermon()"><i class="icon ion-ios-upload-outline"></i></a>
+    </ion-nav-buttons>
+
+	<ion-content  overflow-scroll="true" >
+	<div ng-if="sermon.youtubeURL" class="video-container">
+    <iframe ng-src="{{getSermonVideoUrl()}}" frameborder="0" ></iframe> 
+	</div>
+      
+
+	<div class="list card">
+
+	  <div style="-webkit-user-select: auto;" data-tap-disabled=true  class="item">
+		<h2>{{sermon.title}}</h2>
+		<p>{{sermon.date}}<p>
+		<p>{{sermon.preacher}}</p> 
+		<p>Series: {{sermon.series_name}}<p>
+	  </div>
+
+		<div padding="10px;" ng-if="sermon.mp3path" class="item">Audio:<p>
+	   		<audio padding="10px;" id="audio" ng-src="{{getSermonAudioUrl()}}" controls  ></audio>
+		</div>
+	
+		<div ng-if="!sermon.mp3path" class="item"><p>Sermon audio coming soon.</p>
+		</div>
+
+
+		<div ng-if="sermon.outline" class="item item-body">
+        	<p style="-webkit-user-select: auto;" data-tap-disabled=true ng-bind-html="sermon.outline"></p> 
+		</div>
+  
+
+	</div>  
+
+
+	
+
+    
+    </ion-content>
+    
+</ion-view>    
