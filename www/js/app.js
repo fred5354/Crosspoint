@@ -29,8 +29,9 @@ angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.
 		clearcache: 'yes',
 		toolbar: 'no'
 		};
-		
-        window.open($this.attr('href'), target,'location=yes,toolbar=yes');
+       //console.log($this.attr('href'));		
+        window.open($this.attr('href'), target,'location=yes');
+
     });
 
     // Initialize Push Notifications
