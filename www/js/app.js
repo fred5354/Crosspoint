@@ -24,8 +24,13 @@ angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.
         var $this = $(this); 
         var target = $this.data('inAppBrowser') || '_blank';
 
-        window.open($this.attr('href'), target);
-
+		var options = {
+		location: 'yes',
+		clearcache: 'yes',
+		toolbar: 'no'
+		};
+		
+        window.open($this.attr('href'), target,'location=yes,toolbar=yes');
     });
 
     // Initialize Push Notifications
