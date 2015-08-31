@@ -75,7 +75,7 @@
                             "count": 1
                         },
                         {
-                            "xml": "<receiver android:name=\"com.google.android.gcm.GCMBroadcastReceiver\" android:permission=\"com.google.android.c2dm.permission.SEND\"><intent-filter><action android:name=\"com.google.android.c2dm.intent.RECEIVE\" /><action android:name=\"com.google.android.c2dm.intent.REGISTRATION\" /><category android:name=\"com.hybridapps.mobionic\" /></intent-filter></receiver>",
+                            "xml": "<receiver android:name=\"com.google.android.gcm.GCMBroadcastReceiver\" android:permission=\"com.google.android.c2dm.permission.SEND\"><intent-filter><action android:name=\"com.google.android.c2dm.intent.RECEIVE\" /><action android:name=\"com.google.android.c2dm.intent.REGISTRATION\" /><category android:name=\"com.crosspoint.app\" /></intent-filter></receiver>",
                             "count": 1
                         },
                         {
@@ -125,11 +125,11 @@
                             "count": 1
                         },
                         {
-                            "xml": "<permission android:name=\"com.hybridapps.mobionic.permission.C2D_MESSAGE\" android:protectionLevel=\"signature\" />",
+                            "xml": "<permission android:name=\"com.crosspoint.app.permission.C2D_MESSAGE\" android:protectionLevel=\"signature\" />",
                             "count": 1
                         },
                         {
-                            "xml": "<uses-permission android:name=\"com.hybridapps.mobionic.permission.C2D_MESSAGE\" />",
+                            "xml": "<uses-permission android:name=\"com.crosspoint.app.permission.C2D_MESSAGE\" />",
                             "count": 1
                         },
                         {
@@ -139,7 +139,7 @@
                     ],
                     "/manifest/application/activity": [
                         {
-                            "xml": "<intent-filter><action android:name=\"com.hybridapps.mobionic.MESSAGE\" /><category android:name=\"android.intent.category.DEFAULT\" /></intent-filter>",
+                            "xml": "<intent-filter><action android:name=\"com.crosspoint.app.MESSAGE\" /><category android:name=\"android.intent.category.DEFAULT\" /></intent-filter>",
                             "count": 1
                         }
                     ],
@@ -655,37 +655,37 @@
     },
     "installed_plugins": {
         "com.ionic.keyboard": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "com.phonegap.plugins.barcodescanner": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "com.pushwoosh.plugins.pushwoosh": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "de.appplant.cordova.plugin.email-composer": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "nl.x-services.plugins.socialsharing": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "org.apache.cordova.console": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "org.apache.cordova.device": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "org.apache.cordova.dialogs": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "org.apache.cordova.geolocation": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "org.apache.cordova.inappbrowser": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         },
         "org.apache.cordova.splashscreen": {
-            "PACKAGE_NAME": "com.hybridapps.mobionic"
+            "PACKAGE_NAME": "com.crosspoint.app"
         }
     },
     "dependent_plugins": {}
