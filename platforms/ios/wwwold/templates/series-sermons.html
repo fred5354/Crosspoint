@@ -1,0 +1,66 @@
+<ion-view title="{{series_title}}" >
+
+
+	<ion-nav-buttons side="right">
+    <a class="button button-clear href="href="#/app/sermonArchives" >昔日講道</a>
+    </ion-nav-buttons>
+    
+<!--
+	 <ion-nav-buttons side="right">
+    <div class="button button-clear" ng-click="loadData()"><i class="icon ion-ios-refresh-empty"></i></div>
+    </ion-nav-buttons>
+    -->
+        <div class="padding" ng-if="err">
+			<div class="screen"><img src="img/serverdown.png"/></div>
+			<h2>Opps! Our server is currently experience issues.  Please check back later.</h2>
+    	</div>
+
+    <ion-content class="has-header" overflow-scroll="true">
+  	<div class="screen">
+			<img ng-src="{{series_image}}"/>
+			<!-- <div class="item item-text-wrap">
+				<h1>{{series_title}}</h1>				
+			</div>p0-0-0-
+			-->
+		</div>
+		
+		<div ng-if="series_description" class="item padding item-text-wrap">
+			 <p>{{series_description}}</p>
+			<a class="button button-clear" ng-click="shareSeries()"><i class="icon ion-ios-upload-outline"></i> Share</a>
+		</div>
+		
+
+		
+      <!-- One-column layout -->
+         <ion-list >
+    
+		<div  ng-repeat="sermon in sermons" >
+            <a ng-if="!isFutureSermon(sermon.sermon_date)" class="item" href="{{getHref($index)}}">  
+                <span style="color:#FF6600;" ng-if="isCurrentWeek(sermon.sermon_date)"><i class="icon ion-ios-star-outline"></i> latest</span>            
+                <h2 class="title">{{sermon.title}}	</h2>
+                <p ng-bind-html="sermon.sermon_date"></p>
+                <div class="item-icon-right">
+    	    <i class="icon ion-ios-arrow-right"></i>
+        </div>
+            </a>
+            <div ng-if="isFutureSermon(sermon.sermon_date)"  class="item" >
+                            <h2 style="color:#999999;">{{sermon.title}}	</h2>
+			                <p style="color:#999999;" ng-bind-html="sermon.sermon_date"></p>
+			</div>
+        </div>
+        
+         </ion-list>
+    
+
+    <!-- 
+         <ion-list>
+            
+            <a class="item" href="#/app/feed-master/{{id}}/{{item.id}}" ng-repeat="item in items">  
+                <h2 class="title">{{item.title}}</h2>
+                <p ng-bind-html="item.description"></p></p>
+            </a>
+        
+         </ion-list>
+    -->
+    </ion-content>
+</ion-view>

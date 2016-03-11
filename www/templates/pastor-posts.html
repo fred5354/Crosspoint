@@ -1,0 +1,88 @@
+<ion-view title="牧者週記" class="xpbackground bar-positive" >
+
+ <ion-nav-buttons side="right">
+    <div class="button button-clear" ng-click="loadData()"><i class="icon ion-ios-refresh-empty"></i></div>
+    </ion-nav-buttons>
+    
+    
+
+    
+    <ion-content class="has-header" overflow-scroll="true" delegate-handle="mainScroll" > 
+    
+
+           <ion-refresher
+        pulling-text="Pull to refresh..."
+        on-refresh="loadData()">
+        </ion-refresher>
+
+
+<!--        {{storage}} -->
+        
+        <div class="padding" ng-if="err">
+			<div class="screen"><img src="img/serverdown.png"/></div>
+			<h2>Opps! Our server is currently experience issues.  Please check back later.</h2>
+    	</div>
+
+	            
+<div  ng-repeat="post in posts">
+<!--                <img ng-src="{{post.attachments[0].images.thumbnail.url}}" ng-show="{{post.attachments.length}}" alt="{{post.title}}"> 
+                
+                <h3 style="color:#444444">{{post.title}}</h3>
+                <p style="-webkit-user-select: auto;" data-tap-disabled=true ng-bind-html="post.content"></p>
+                <a  style="color:#FF6600;" ng-if="isRegisterURL($index)" class="button button-calm" ng-href="{{getRegisterURL($index)}}"><i class="icon ion-ios-compose-outline"></i> {{getRegisterTitle($index)}}</a>
+                <a style="color:#FF6600;" class="button button-clear" ng-click="shareEntry($index)"><i class="icon ion-ios-upload-outline"></i> Share</a>
+-->
+
+
+
+		<div ng-if="post.categories[0].slug == 'wordsofpastorchiu' || post.categories[0].slug == 'wordsofpastorfung'" class="list card">
+
+	<div ng-switch on="post.categories[0].slug">
+		  	<div class="item item-text-wrap item-avatar" >
+				<img ng-switch-when="wordsofpastorchiu" src="img/PastorChiu.jpg"> 
+				<img ng-switch-when="wordsofpastorfung" src="img/PastorFung.jpg"> 
+		    	<strong><h1 style="color:#444444">{{post.title}}</h1></strong>
+    			{{post.modified}} 
+
+		  	</div>
+</div>
+			<div class="item item-body" >
+
+		        <a  href="#/app/posts/{{$index}}" >
+        		<p style="-webkit-user-select: auto;" data-tap-disabled=true ng-bind-html="post.excerpt"></p>
+				 </a>
+	 	    </div>
+  
+	
+			
+			<div class="item item-divider">
+                <a ng-if="post.OKtoShare" class="buttonxp button-light" ng-click="shareEntryPost($index)"><i class="icon ion-ios-upload-outline"></i> Share</a>
+			</div>
+		</div>
+	</div>
+
+
+	
+	
+
+            
+
+<div ng-if="lastModifiedDate" class="padding">
+<div class="title" style="color:#999999;">News last updated on {{lastModifiedDate}}</div>
+</div>
+
+           
+            
+          
+<!--  
+        <div class="padding">
+        <button class="button button-block button-positive" ng-show="hasMoreItems()" ng-click="showMoreItems()" >
+        Show more
+        </button>
+        </div>
+    -->
+       
+    </ion-content>
+</ion-view>
+
+

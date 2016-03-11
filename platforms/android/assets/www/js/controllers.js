@@ -1,7 +1,7 @@
 angular.module('mobionicApp.controllers', [])
 
 // Home Controller
-.controller('HomeCtrl', function($scope, Data, $ionicLoading, FeedPluginData) {
+.controller('HomeCtrl', function($scope, Data, $ionicLoading, SeriesSermonData) {
   $scope.items = Data.items;
 
 
@@ -19,10 +19,10 @@ angular.module('mobionicApp.controllers', [])
     });
     */
     /*
-       FeedPluginData.asyncCategories("newest").then(
+       SeriesSermonData.asyncCategories("newest").then(
         // successCallback
         function() {
-            $scope.series_image = FeedPluginData.get_series_image(); 
+            $scope.series_image = SeriesSermonData.get_series_image(); 
             $ionicLoading.hide();
              ionic.Platform.ready( function() {
 			    if(navigator && navigator.splashscreen) navigator.splashscreen.hide();
@@ -49,7 +49,7 @@ angular.module('mobionicApp.controllers', [])
 
 
 // News Controller
-.controller('NewsCtrl', function($scope, $ionicLoading, NewsData, NewsStorage) {
+.controller('SermonArchivesCtrl', function($scope, $ionicLoading, SermonArchivesData, SermonArchivesStorage) {
     
     $scope.news = [];
     $scope.storage = '';
@@ -66,32 +66,38 @@ angular.module('mobionicApp.controllers', [])
       showDelay: 10
     });
     
-    NewsData.async().then(
+    var getData = function() {    SermonArchivesData.async().then(
         // successCallback
         function() {
-            $scope.news = NewsData.getAll();
+            $scope.news = SermonArchivesData.getAll();
 			d = $scope.news;
 
             $ionicLoading.hide();
         },
         // errorCallback 
         function() {
-            $scope.news = NewsStorage.all();
+            $scope.news = SermonArchivesStorage.all();
             $scope.storage = '.';
             $ionicLoading.hide();
         },
         // notifyCallback
         function() {}
     );
+    }
+    
+        getData();
 
 })
 
 // New Controller
+/*
 .controller('NewCtrl', function($scope, $stateParams, NewsData) {
 
     $scope.new = NewsData.get($stateParams.newId);
     
 })
+*/
+
 
 // Products Controller
 .controller('ProductsCtrl', function($scope, $ionicLoading, ProductsData, ProductsStorage) {
@@ -143,33 +149,19 @@ angular.module('mobionicApp.controllers', [])
 
 })
 
-// Map Controller
-.controller('MapCtrl', function($scope, MapData) {
-
-    $scope.windowOptions = false;
-
-    $scope.onClick = function () {
-    this.windowOptions = !this.windowOptions;
-    };
-
-    $scope.closeClick = function () {
-    this.windowOptions = false;
-    };
-
-    $scope.map = MapData.map;
-
-})
 
 // About Controller
-.controller('AboutCtrl', function($scope, $ionicLoading, AboutData, AboutStorage, $sce) {
+.controller('AboutCtrl', function($scope, $ionicLoading, AboutData, PastorData, AboutStorage, $sce) {
     
     $scope.about = [];
  
     $scope.getContent = function(id) {	
 	   return $sce.trustAsHtml(AboutData.get(id));    
     }
+	
+	$scope.pastors = PastorData.pastors;
+	
 
-    
     $scope.loading = $ionicLoading.show({
       template: '<i class="icon ion-loading-c"></i> Loading Data',
 
@@ -206,7 +198,10 @@ angular.module('mobionicApp.controllers', [])
 })
 
 // Contact Controller
-.controller('ContactCtrl', function($scope) {
+.controller('ContactCtrl', function($scope,$stateParams) {
+    
+    
+    $scope.to = $stateParams.to;
     
     $scope.contact = {
       subject:  '',
@@ -228,135 +223,262 @@ angular.module('mobionicApp.controllers', [])
 })
 
 // Posts Controller
-.controller('PostsCtrl', function($scope, $ionicLoading, PostsData, PostsStorage, $sce, $http) {
+.controller('PostsCtrl', function($ionicScrollDelegate, broadcast,LastAJAXloadedTime,$ionicPlatform, $scope, myDateFunc, $ionicLoading, PostsData, PostsStorage,SettingsStorage, $sce, $http,$cordovaCalendar) {
     
     $scope.posts = [];
     $scope.storage = '';
 	var data;     
+	
 
+	$scope.$on(broadcast.events.onResume, function (event) {
+   		console.log('reloading in background');
+   	    _loadData('isbackground');
+	});
+        
+	$scope.loadData = function (s) {
 
+		if (s != 'isbackground'){
+			$scope.loading = $ionicLoading.show({
+			  template: '<i class="spinner-a">Loading..</i>',
+			  animation: 'fade-in',
+			  showBackdrop: false,
+			  showDelay: 10
+			});
+		}
 		
-	$scope.loadData = function () {
-
-		
-		$scope.loading = $ionicLoading.show({
-		  template: '<i class="icon ion-loading-c"></i> Loading News',
-
-		  //Will a dark overlay or backdrop cover the entire view
-		  showBackdrop: false,
-
-		  // The delay in showing the indicator
-		  showDelay: 10
-		});
-		
-	   $http({method: 'GET', url: PostsData.getJson(), timeout: 5000}).
-		success(function(d) {
-
+	   $http({method: 'GET', url: PostsData.getJson(), timeout: 8000}).
+		success(function(d) {	
 			data = d;
+			
+            PostsData.setData(data);            
+              
+              
+            var postModifiedDates = [];          
+           	for (id in data.posts){
+				postModifiedDates.push(data.posts[id].modified);
+           	
+           		data.posts[id].timePlace = PostsData.getTimeAndPlace(id);
+           		data.posts[id].excerpt = formatExcerpt(data.posts[id].excerpt);
+           		data.posts[id].registerTitle = PostsData.getRegisterTitle(id);
+           		data.posts[id].registerUrl = PostsData.getRegisterUrl(id);
+           		data.posts[id].OKtoShare = PostsData.getOKtoShare(id);
+           		data.posts[id].hasEventTimeDate = PostsData.gethasEventTimeDate(id);
+           		data.posts[id].modified = myDateFunc.formatDate(new Date(data.posts[id].modified.substring(0,10)));
+           	} 
 
-			PostsStorage.save(data);
+
             $scope.posts = data.posts;
-            PostsData.setData(data);
-             $ionicLoading.hide();
+			var lastModifiedDate = myDateFunc.formatDate(myDateFunc.convertStrToDateObj(getLastModifiedDate(postModifiedDates)));
+			data.lastModifiedDate = lastModifiedDate;			
+			$scope.lastModifiedDate = lastModifiedDate;
+			PostsStorage.save(data);			
+			
+			LastAJAXloadedTime.setCurrentTimeStamp();
+                $ionicScrollDelegate.$getByHandle('mainScroll').scrollTop(true);
+
+
+             $ionicLoading.hide();             
              ionic.Platform.ready( function() {
 			    if(navigator && navigator.splashscreen) navigator.splashscreen.hide();
 			});             
 			$scope.$broadcast('scroll.refreshComplete');
-
+			console.log('News loaded from server');
 
 		}).
-		error(function() {
-
+		error(function(e) {
 			data = PostsStorage.all();
             $scope.posts = data.posts;
             $ionicLoading.hide();
              ionic.Platform.ready( function() {
 			    if(navigator && navigator.splashscreen) navigator.splashscreen.hide();
 			});
-            
+            if (!data.posts) $scope.err = true;
 			$scope.$broadcast('scroll.refreshComplete');
-
-
 		});
     }
+   
+	
+	var _loadData = function(s){	
+		$scope.$on('$ionicView.beforeEnter', function(){
+			console.log('beforeEnter');
+			if (LastAJAXloadedTime.isExpired()) {
+				$scope.loadData(s);
+			}else{
+					data = PostsStorage.all();
+					$scope.posts = data.posts;
+					$scope.lastModifiedDate = data.lastModifiedDate +".";            
+			}
+			}
+		); 
+	}
     
-    $scope.loadData();
+	_loadData();
     
     
     
     
-	$scope.formatDate = function(a){
-
-		d = new Date(a.substring(0,10));
-		   var m_names = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-    var curr_day = d.getDate();
-    var curr_hours = d.getHours();
-    var curr_minutes = d.getMinutes();
-
-    if (curr_day < 10) {
-        curr_day = '0' + curr_day;
-    }
-
-
-    return ( m_names[d.getMonth()] + ' ' + curr_day + ', ' + d.getFullYear() );
+	var getLastModifiedDate = function(postModifiedDates){
+		
+						
+			postModifiedDates.sort(function(a, b){
+			    return a-b;
+			});
+			
+		return postModifiedDates[0];
+			
+	
+			
 	
 	}
     
-    $scope.getExcerpt = function(s){
+    var formatExcerpt = function(s){
+	    s = s.replace("&#8230;..",".... continue reading ");
     	return s.replace("Read more","");
     
     }
-    
-    $scope.getRegisterTitle = function(d){
-	     try{
-     		var a = $scope.posts[d].custom_fields.post_1_sign_up_title[0].split(";")[2].split(":");
-			var registerTitle = a[2];
-			registerTitle = registerTitle.replace(/\"/g, "");
-			if (registerTitle){
-				return registerTitle;}else{return "Sign Up";}
 
-    	 }catch(er){
-    	 	return "";
-    	 }
-	}
-    
-    $scope.isRegisterURL = function(d){
-		try {
-
-			var a = $scope.posts[d].custom_fields.post_1_sign_up_url[0].split(";")[2].split(":")[2];
-    		if (a.length>2){  return true; }else{return false ;}    	
-    	}catch(err){
-    		return false;
-    	}
-
-    }
-
-	$scope.getRegisterURL = function(d){
-		var a = $scope.posts[d].custom_fields.post_1_sign_up_url[0].split(";")[2].split(":");
-		var registerURL = a[2]+":"+a[3];
-		registerURL = registerURL.replace(/\"/g, "");
-		return registerURL;
-		//window.open(registerURL, '', '');
-	}
 	
 	
-	
-	
- 
- 	$scope.shareEntryPost = function (d) {
+	 var decodeHtmlEntity = function(str) {
+	  return str.replace(/&#(\d+);/g, function(match, dec) {
+		return String.fromCharCode(dec);
+	  });
+	};
 
-		
+ 	$scope.shareEntryPost = function (d) {	
         var subject = $scope.posts[d].title;
         var message = $scope.posts[d].content;
         message = message.replace(/(<([^>]+)>)/ig,"");
-
+                message = message.replace(/&nbsp;/ig,"");
+		message = decodeHtmlEntity(message);
 
         var link = $scope.posts[d].url;
 
         //Documentation: https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin
         //window.plugins.socialsharing.share('Message', 'Subject', 'Image', 'Link');
+
         window.plugins.socialsharing.share(message, subject, null, link);
     }
+
+
+	var extractDate = function(t,k){
+	  		   // ["s", "19", ""2016-01-19 03", "37", "59""] 
+
+			var s = t[0].split(";")[2].split(":");
+			var year = s[2].split(" ")[0].split("-")[0].replace("\"","");
+			var month = s[2].split(" ")[0].split("-")[1]-1;
+			var day = s[2].split(" ")[0].split("-")[2];
+			var hour = parseInt(s[2].split(" ")[1]);
+			var minute = s[3];
+			//["s", "2", ""pm""]
+					
+			var a = k[0].split(";")[2].split(":")[2];
+			if (a == '"pm"') {hour += 12;}
+					
+			return [year,month, day, hour, minute];
+	}
+	
+	
+
+	$scope.remindMe = function(d){
+
+
+			var s = $scope.posts[d].custom_fields.post_1_start_date_time;
+			var t = $scope.posts[d].custom_fields.post_1_start_am_pm;
+			var ab  = extractDate(s,t);								
+			var startDate = myDateFunc.getPSTtime(new Date(ab[0], ab[1], ab[2], ab[3], ab[4], 0, 0, 0));
+			    
+					console.log(startDate);
+					console.log('the time is'+startDate);
+
+
+			
+			try {									
+				var s = $scope.posts[d].custom_fields.post_1_end_date_time[0].split(";")[2].split(":");
+			
+				var endDate;			
+				if (s.length>3){
+							var ab  = extractDate($scope.posts[d].custom_fields.post_1_end_date_time,
+										$scope.posts[d].custom_fields.post_1_end_am_pm);								
+					endDate = myDateFunc.getPSTtime(new Date(ab[0], ab[1], ab[2], ab[3], ab[4], 0, 0, 0));
+			
+			}else{
+				endDate = new Date(startDate);
+				endDate.setHours(endDate.getHours()+2);
+			}
+
+			//["s", "2", ""pm""]
+			
+		
+			//console.log(start_year+' '+start_month+' '+start_day+' '+start_hour+' '+start_minute);			
+		//	console.log(end_year+' '+end_month+' '+end_day+' '+end_hour+' '+end_minute);
+		//	console.log(endDate);
+
+	
+		} catch(err){ console.log(err);				
+									console.log('2');
+				endDate = new Date(startDate);
+				endDate.setHours(endDate.getHours()+2); 
+		}
+
+		title = $scope.posts[d].title_plain;
+		notes = $scope.posts[d].timePlace+'. '+$scope.posts[d].url;
+
+		
+
+//		console.log(start_year+' '+start_month+' '+start_day+' '+start_hour+' '+start_minute);			
+		
+
+		
+//		console.log(end_year+' '+end_month+' '+end_day+' '+end_hour+' '+end_minute);
+		//console.log(startDate);
+
+		//console.log(endDate);
+
+var eventExists = false;		
+
+  $cordovaCalendar.findEvent({
+			title: title,
+			location: '',
+			notes: notes,
+			startDate: startDate, 
+			endDate: endDate
+  }).then(function (result) {
+	if (result.length) {
+
+		var msg = "The event is already added to your calendar.";
+		navigator.notification.alert(msg,function() {console.log("Alert success")},"Event existed","Close");
+		
+	}else{
+		createEvent();
+		console.log('no event exists');
+	}
+  }, function (err) {
+						 var msg = "The event cannot be added to your calendar.  Please check your privacy setting and allow Crosspoint App to access your calendar.";
+				 	    navigator.notification.alert(msg,function() {console.log("Alert success")},"Sorry.","Close");
+  });
+  
+
+	var  createEvent =	function(){
+		$cordovaCalendar.createEvent({
+			title: title,
+			location: '',
+			notes: notes,
+			startDate: startDate, 
+			endDate: endDate
+			 }).then(function (result) {
+			 console.log('success');
+			 var msg = 'The event has been added to calendar on ' + startDate;
+					    navigator.notification.alert(msg,function() {console.log("Alert success")},"Event Added","Close");
+			}, function (err) {
+						 console.log(err);
+						 var msg = "The event cannot be added to your calendar.  Please check your privacy setting and allow Crosspoint App to access your calendar.";
+				 	    navigator.notification.alert(msg,function() {console.log("Alert success")},"Sorry.","Close");
+			});
+			
+			}
+
+	}
 
   
 
@@ -388,18 +510,17 @@ angular.module('mobionicApp.controllers', [])
         //Documentation: https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin
         //window.plugins.socialsharing.share('Message', 'Subject', 'Image', 'Link');
         window.plugins.socialsharing.share(message, subject, null, link);
-    }
-    
+    }    
 })
 
 // ServerPosts Controller
-.controller('ServerPostsCtrl', function($scope, $http, $ionicLoading, ServerPostsData, ServerPostsStorage) {
-    var data = []
+.controller('RegistrationsCtrl', function($scope, $ionicLoading, RegistrationPosts) {
+
     $scope.posts = [];
-    $scope.storage = '';
-    
+        
     $scope.loading = $ionicLoading.show({
-      template: '<i class="icon ion-loading-c"></i> Loading Data',
+			  template: '<i class="spinner-a">Loading..</i>',
+
 
       //Will a dark overlay or backdrop cover the entire view
       showBackdrop: false,
@@ -408,57 +529,41 @@ angular.module('mobionicApp.controllers', [])
       showDelay: 10
     });
     
-    $scope.loadData = function () {
+    var getData = function() {
         
-        $http({method: 'GET', url: ServerPostsData.getURL(), timeout: 5000}).
-        // this callback will be called asynchronously
-        // when the response is available.
-        success(function(data) {
-            $scope.more = data.pages !== $scope.page;
-            $scope.posts = $scope.posts.concat(data.posts);
-            ServerPostsData.setData($scope.posts);
-            ServerPostsStorage.save(data);
-            $ionicLoading.hide();
-        }).
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
-        error(function() {
-            $scope.posts = ServerPostsStorage.all().posts;
-            ServerPostsData.setData(ServerPostsStorage.all().posts);
-            $scope.storage = '.';
-            $ionicLoading.hide();
-        });
-
-    };
-        
-    $scope.showMoreItems = function () {
-        $scope.page += 1;
-        $ionicLoading.show({
-        template: '<i class="icon ion-loading-c"></i> Loading Data',
-
-        //Will a dark overlay or backdrop cover the entire view
-        showBackdrop: false,
-
-        // The delay in showing the indicator
-        showDelay: 10
-        });
-        $scope.loadData();
+        RegistrationPosts.async().then(
+            // successCallback
+            function() {
+                $scope.posts = RegistrationPosts.getRegPosts();
+                $ionicLoading.hide();
+                $scope.$broadcast('scroll.refreshComplete');
+            },
+            // errorCallback 
+            function() {
+                $ionicLoading.hide();
+                $scope.$broadcast('scroll.refreshComplete');
+            },
+            // notifyCallback
+            function() {}
+        );
     }
-
-    $scope.hasMoreItems = function () {
-        return $scope.more;
+    
+    getData();
+    
+    $scope.doRefresh = function() {
+        getData();  
     }
-
-    $scope.page = 1;
-    $scope.more = true;
-    $scope.loadData();
     
 })
 
 // ServerPost Controller
-.controller('ServerPostCtrl', function($scope, $stateParams, ServerPostsData, $sce) {
+.controller('RegistrationCtrl', function($scope, $stateParams, RegistrationPosts, $sce) {
 
-    $scope.post = ServerPostsData.get($stateParams.serverpostId);
+
+    $scope.post = RegistrationPosts.getRegPost($stateParams.serverpostId);
+    
+    t = $scope.post;
+    
     
     $scope.content = $sce.trustAsHtml($scope.post.content);
     
@@ -688,7 +793,7 @@ angular.module('mobionicApp.controllers', [])
 .controller('NotificationsCtrl', function($scope) {
     
     $scope.alertNotify = function() {
-    navigator.notification.alert("Sample Alert",function() {console.log("Alert success")},"My Alert","Close");
+	    navigator.notification.alert("Sample Alert",function() {console.log("Alert success")},"My Alert","Close");
     };
 
     $scope.beepNotify = function() {
@@ -720,59 +825,17 @@ angular.module('mobionicApp.controllers', [])
     
 })
 
-// Geolocation Controller
-.controller('GeolocationCtrl', function($scope, $ionicLoading) {
-    
-    $scope.map = {
-    center: {
-        latitude: 45, 
-        longitude: -73
-    },
-    marker: {},
-    zoom: 5
-    };
 
-    $scope.loading = $ionicLoading.show({
-
-      //The text to display in the loading indicator
-      template: '<i class="icon ion-loading-c"></i> Getting current location',
-
-      //Will a dark overlay or backdrop cover the entire view
-      showBackdrop: false,
-
-      // The delay in showing the indicator
-      showDelay: 10
-    });
-
-    var options = { enableHighAccuracy: true };
-    navigator.geolocation.getCurrentPosition(function(position) {
-
-        $scope.map = {
-            center: {
-                latitude: position.coords.latitude, 
-                longitude: position.coords.longitude
-            },
-            marker: {
-                latitude: position.coords.latitude, 
-                longitude: position.coords.longitude
-            },
-            zoom: 12
-        };
-
-        $ionicLoading.hide();
-        
-        }, function(error) {
-        alert('Unable to get location: ' + error.message);
-        $ionicLoading.hide();
-    }, options);
-
-
-})
 
 // Seetings Controller
-.controller('SettingsCtrl', function($scope, SettingsStorage, NewsStorage, ProductsStorage, AboutStorage, FeedsStorage, PostsStorage, ServerPostsStorage) {
+.controller('SettingsCtrl', function($scope, SettingsStorage, $state) {
+ 
  
     $scope.settings = SettingsStorage.all();
+    
+	s = $scope.settings;
+	
+
 
     $scope.saveSettings = function() {
         SettingsStorage.save($scope.settings);
@@ -783,35 +846,69 @@ angular.module('mobionicApp.controllers', [])
     $scope.resetSettings = function() {
         SettingsStorage.clear();
         $scope.settings = SettingsStorage.all();
+
     };
-    
-    $scope.resetNewsStorage = function() {
-        NewsStorage.clear();
-    };
-    
-    $scope.resetProductsStorage = function() {
-        ProductsStorage.clear();
-    };
-    
-    $scope.resetAboutStorage = function() {
-        AboutStorage.clear();
-    };
-    
-    $scope.resetFeedsStorage = function() {
-        FeedsStorage.clear();
-    };
-    
-    $scope.resetPostsStorage = function() {
-        PostsStorage.clear();
-    };
-    
-    $scope.resetServerPostsStorage = function() {
-        ServerPostsStorage.clear();
-    };
-    
+  
+  	$scope.isFirstSetting = function(){
+
+  		if ($state.current.name = "settings"){
+  			return true;
+  		}
+  		return false;
+  	}
+  	
+
+
+
+
+  	
 })
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout, MenuData, $ionicActionSheet) {
+// firstTimeCtrl Controller
+.controller('firstTimeCtrl', function($scope, SettingsStorage, $state) {
+ 
+
+  
+   ionic.Platform.ready( function() {
+			    if(navigator && navigator.splashscreen) navigator.splashscreen.hide();
+	});             
+    $scope.settings = SettingsStorage.all();
+
+    $scope.saveSettings = function() {
+        SettingsStorage.save($scope.settings);
+    };
+    
+    $scope.$watch('settings', function() { SettingsStorage.save($scope.settings) }, true);
+    
+
+  	$scope.goHome = function(){
+  		$state.go("app.posts");
+  	}    
+})
+
+
+
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, MenuData, $ionicActionSheet, $state) {
+
+
+ /*
+	var lang = JSON.parse(window.localStorage['settings']).campus;
+
+
+ 
+ 
+	if (!lang)
+		$state.go('firsttime');
+	else
+		$state.go('app.posts');
+		
+*/		
+
+	//if(0) //if first time
+	  //  $state.go('app.archive'); //go to sign up view.
+	//else
+   		 
+
 
   /*  
   $scope.items = MenuData.items;
@@ -873,7 +970,7 @@ angular.module('mobionicApp.controllers', [])
 })
 
 // Feed Plugin Categories Controller
-.controller('FeedPluginCategoriesCtrl', function($scope, $http, $ionicLoading, $stateParams, FeedPluginData) {
+.controller('SeriesSermonsCtrl', function($scope, $http, $ionicLoading, $stateParams, SeriesSermonData,myDateFunc) {
     
     
 	var data = [];
@@ -888,64 +985,92 @@ angular.module('mobionicApp.controllers', [])
     s = $stateParams.series_slug;
 	
 	$scope.loadData = function () {
+	
 	    $scope.loading = $ionicLoading.show({
-      template: '<i class="icon ion-loading-c"></i> Loading Sermons',
+			  template: '<i class="spinner-a">Loading..</i>',
 
       //Will a dark overlay or backdrop cover the entire view
-      showBackdrop: false,
+      showBackdrop: true,
         
       // The delay in showing the indicator
       showDelay: 10
     });
     
     
-    url = FeedPluginData.getJson();
+    url = SeriesSermonData.getJson();
 	
 
     if ($stateParams.series_slug){
     	s = $stateParams.series_slug;
     	if(s != 'newest'){
-    		url += '?s='+s;
+    		url += '&s='+s;
     	}
     }
-        $http({method: 'GET', url: url, timeout: 5000}).
+    
+                start = new Date().getTime();
+        $http({method: 'GET', url: url, timeout: 8000}).
         // this callback will be called asynchronously
         // when the response is available.
         success(function(data) {
-
-            $scope.sermons = data.sermons;
-            $scope.series_title = data.series_name;
-            $scope.series_slug = data.series_slug;            
-            $scope.series_description = data.series_description;
-            $scope.series_date = data.series_date;            
-            $scope.series_image = data.series_image;            
-	        $scope.site_langs = data.sermons[0].site_langs;
-            
-            FeedPluginData.setData(data); 
-            $ionicLoading.hide();
+			try{
+				$scope.sermons = data.sermons;
+				$scope.series_title = data.series_name;
+				$scope.series_slug = data.series_slug;            
+				$scope.series_description = data.series_description;
+				$scope.series_date = data.series_date;            
+				$scope.series_image = data.series_image;            
+				$scope.site_langs = data.sermons[0].site_langs;
+				$scope.series_url = data.href;
+				SeriesSermonData.setData(data); 
+				s = SeriesSermonData.getLatestSermonDate();				
+				data.latestSermonDate = myDateFunc.getPSTtime(new Date(s)).getTime();
+				console.log(data.latestSermonDate);
+				console.log('time taken for request: ' + (new Date().getTime() - start) + 'ms');
+				SeriesSermonData.setData(data); 
+				
+			}catch(e){
+					$scope.err = true;
+			}
+			$ionicLoading.hide();
         }).
         // called asynchronously if an error occurs
         // or server returns response with an error status.
-        error(function() {
-           $scope.posts = ServerPostsStorage.all().posts;
-            ServerPostsData.setData(ServerPostsStorage.all().posts);
-            $scope.storage = '.'; 
+        error(function(e) {
             $ionicLoading.hide();
+
+         //   $scope.posts = ServerPostsStorage.all().data;
+           // ServerPostsData.setData(ServerPostsStorage.all().posts);
+            
+            $scope.err = true;
+            $scope.storage = '.'; 
         });
 
     };
         $scope.loadData();
         
+         
+        
+        $scope.getPostID = function(id){
+        	return $scope.sermons[id].post_id;
+        }
+        
+       
+       $scope.getHref = function(id){
+       
+
+       
+       		var campus = SeriesSermonData.getCampus();
+			
+       		if (campus)
+       			return "#/app/series-sermon/"+$scope.series_slug+"/"+id+"/"+campus;
+       		else
+       			return "#/app/series-campuses/"+id;
+       
+       } 
+                
          $scope.isCurrentWeek= function(sd){
-	 		  var sermondate = new Date(sd);
-		   	 var nextweek = new Date(sermondate);
-   	 		 nextweek.setDate(nextweek.getDate()+6);
-	 		 var today = new Date();
-	 		if ( (today >= sermondate) &&(today<=nextweek) ){
-				return true;
-	 		}
-	 		return false;	 
-	 }
+	 		 return SeriesSermonData.isCurrentWeek(sd);
+		 }
 
 
 	 $scope.isFutureSermon = function(sd){
@@ -960,6 +1085,7 @@ angular.module('mobionicApp.controllers', [])
 	 		return true;	  
 	 }
 
+	
 	 
  $scope.shareSeries = function () {
 
@@ -967,7 +1093,10 @@ angular.module('mobionicApp.controllers', [])
         var message = $scope.series_description;
         message = message.replace(/(<([^>]+)>)/ig,"");
 
-        var link = $scope.href;
+
+
+        var link = $scope.series_url;
+        
         
         window.plugins.socialsharing.share(message, subject, null, link);
     }	 
@@ -976,15 +1105,15 @@ angular.module('mobionicApp.controllers', [])
             
 
 /*
-    FeedPluginData.asyncCategories(s).then(
+    SeriesSermonData.asyncCategories(s).then(
         // successCallback
         function() {
-            $scope.sermons = FeedPluginData.getSermons();
-            $scope.series_title = FeedPluginData.get_series_title(); 
-            $scope.series_description = FeedPluginData.get_series_description(); 
-            $scope.series_date = FeedPluginData.get_series_date(); 
-            $scope.series_image = FeedPluginData.get_series_image(); 
-            $scope.site_langs = FeedPluginData.getSiteLangs(0);            
+            $scope.sermons = SeriesSermonData.getSermons();
+            $scope.series_title = SeriesSermonData.get_series_title(); 
+            $scope.series_description = SeriesSermonData.get_series_description(); 
+            $scope.series_date = SeriesSermonData.get_series_date(); 
+            $scope.series_image = SeriesSermonData.get_series_image(); 
+            $scope.site_langs = SeriesSermonData.getSiteLangs(0);            
             $ionicLoading.hide();
         },
         // errorCallback 
@@ -1000,44 +1129,54 @@ angular.module('mobionicApp.controllers', [])
 })
 
 // Feed Plugin Category Controller
-.controller('FeedPluginCategoryCtrl', function($scope, $ionicLoading, $stateParams, FeedPluginData) {
+.controller('SeriesCampusesCtrl', function($scope, $ionicLoading, $stateParams, SeriesSermonData) {
     
     $scope.id = $stateParams.id;
 	
 	
     v = $stateParams;
+    
+
 
     
-  //  $scope.title = FeedPluginData.getSermonTitle($stateParams.id);
+  //  $scope.title = SeriesSermonData.getSermonTitle($stateParams.id);
     
-         	$scope.sermons = FeedPluginData.getSermons();
-            $scope.series_title = FeedPluginData.get_series_title(); 
-            $scope.series_slug = FeedPluginData.get_series_slug(); 
+         	$scope.sermons = SeriesSermonData.getSermons();
+            $scope.series_title = SeriesSermonData.get_series_title(); 
+            $scope.series_slug = SeriesSermonData.get_series_slug(); 
 
-            $scope.series_description = FeedPluginData.get_series_description(); 
-            $scope.series_date = FeedPluginData.get_series_date(); 
-            $scope.series_url = FeedPluginData.get_series_url();
+            $scope.series_description = SeriesSermonData.get_series_description(); 
+            $scope.series_date = SeriesSermonData.get_series_date(); 
+            $scope.series_url = SeriesSermonData.get_series_url();
+            $scope.series_image = SeriesSermonData.get_series_image();
 
             d = $scope.series_date;
 
-	 
-			$scope.site_langs = FeedPluginData.getSiteLangs($scope.id);
-			$scope.post_id = FeedPluginData.getSermonPostID($scope.id);
+
+			$scope.site_langs = SeriesSermonData.getSiteLangs($scope.id);
+			$scope.post_id = SeriesSermonData.getSermonPostID($scope.id);
+
             
-            $scope.series_image = FeedPluginData.get_series_image(); 
+            
+            
+            $scope.series_image = SeriesSermonData.get_series_image(); 
              $scope.site_lang_id = $stateParams.id;
     
 })
 
 // Feed Plugin Feeds Controller
-.controller('FeedPluginMasterCtrl', function($scope, $ionicLoading, $stateParams, FeedPluginData,$sce, $http) {
+.controller('SermonCtrl', function($scope, $ionicLoading, $stateParams, SeriesSermonData,$sce, $http,$cordovaMedia) {
 	v = $stateParams;
 	$scope.sermon = [];
 
-	url = FeedPluginData.getJson()+'?s='+v.series_slug+'&post_id='+v.sermonPostID+'&site_lang='+v.siteLangID;
+	url = SeriesSermonData.getJson()+'&s='+v.series_slug+'&post_id='+v.sermonPostID+'&site_lang='+v.siteLangID;
+    var media; 
 
+
+	start = new Date().getTime();
 
 	$scope.loadData = function () {
+	/*
 	    $scope.loading = $ionicLoading.show({
       template: '<i class="icon ion-loading-c"></i> Loading Sermon',
 
@@ -1047,28 +1186,44 @@ angular.module('mobionicApp.controllers', [])
       // The delay in showing the indicator
       showDelay: 10
     });
-        
+       
+*/
+
+       data = SeriesSermonData.getSermonSiteLang(v.sermonPostID,v.siteLangID);
+//       console.log(data);
+            $scope.sermon = data;     
+            $scope.series_image =      SeriesSermonData.get_series_image();
+                    	 media = new Media($scope.sermon.mp3path, null, null, mediaStatusCallback);
+
+/*
+
         $http({method: 'GET', url: url, timeout: 5000}).
         // this callback will be called asynchronously
         // when the response is available.
         success(function(data) {
+	        console.log('time taken for request: ' + (new Date().getTime() - start) + 'ms');
             $scope.sermon = data;            
-            
+        	
             d = $scope.sermon;
-            
-            //FeedPluginData.setData(data);
-            $ionicLoading.hide();
+
+                        $ionicLoading.hide();
+            //SeriesSermonData.setData(data);
+           	
+ 
+
         }).
         // called asynchronously if an error occurs
         // or server returns response with an error status.
         error(function() {
-         /*   $scope.posts = ServerPostsStorage.all().posts;
-            ServerPostsData.setData(ServerPostsStorage.all().posts);
-            $scope.storage = '.'; */
+         //   $scope.posts = ServerPostsStorage.all().posts;
+          //  ServerPostsData.setData(ServerPostsStorage.all().posts);
+            $scope.storage = '.'; 
             $ionicLoading.hide();
         });
+*/
 
     };
+    
         $scope.loadData();	
 	
     
@@ -1086,11 +1241,62 @@ angular.module('mobionicApp.controllers', [])
         return $sce.trustAsResourceUrl(videoUrl);
     }
     
+    
     $scope.getSermonAudioUrl = function () {
     		audioURL = $scope.sermon.mp3path;
             return $sce.trustAsResourceUrl(audioURL);
     }
-	
+    
+    
+ 
+    
+    
+    $scope.isAndroid = function(){
+    	 if(device.platform == "Android") {
+    	 	return true;
+    	 }
+    	 return false;
+    }
+    
+	$scope.isIOS = function(){
+		if (device.platform == "iPhone" || device.platform == "iOS") {
+        	return true;
+        }
+        return false;
+	}
+
+     
+    var isPlaying = false;
+    
+    $scope.play = function() {
+		$scope.playingStatus = "Playing ... ";
+    	if (!isPlaying){
+	        $cordovaMedia.play(media);
+	        isPlaying = true;
+	    }
+    }
+    
+    $scope.pause = function(){
+    	if(isPlaying){
+    		$scope.playingStatus = "Paused";
+    		$cordovaMedia.pause(media);
+    		isPlaying = false;
+    	}
+    }
+    
+    $scope.stop = function() {
+	    $scope.playingStatus = "Stopped";
+        $cordovaMedia.stop(media);
+        isPlaying = false;
+    } 
+ 
+    var mediaStatusCallback = function(status) {
+        if(status == Media.MEDIA_STARTING) {
+            $ionicLoading.show({template: 'Loading mp3...'});
+        } else {
+            $ionicLoading.hide();
+        }
+    }
    $scope.shareSermon = function () {
 
         var subject = $scope.sermon.title;
@@ -1107,9 +1313,9 @@ angular.module('mobionicApp.controllers', [])
 })
 
 // Feed Plugin Feed Controller
-.controller('FeedPluginDetailCtrl', function($scope, $stateParams, FeedPluginData, $sce) {
+.controller('FeedPluginDetailCtrl', function($scope, $stateParams, SeriesSermonData, $sce) {
     
-    $scope.entry = FeedPluginData.getFeed($stateParams.id);
+    $scope.entry = SeriesSermonData.getFeed($stateParams.id);
     
     $scope.content = $sce.trustAsHtml($scope.entry.content);
     
@@ -1240,6 +1446,20 @@ angular.module('mobionicApp.controllers', [])
         //Documentation: https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin
         //window.plugins.socialsharing.share('Message', 'Subject', 'Image', 'Link');
         window.plugins.socialsharing.share(message, subject, null, link);
+        
+        
     }
     
 })
+
+.controller('myCtrl', function($scope, $cordovaAppVersion) {
+
+  document.addEventListener("deviceready", function () {
+
+    $cordovaAppVersion.getVersionNumber().then(function (version) {
+        var appVersion = version;
+      });
+  }, false);
+  
+})  
+

@@ -1,0 +1,25 @@
+<ion-view title="Settings">
+    <ion-content >
+        
+        <div class="screen">
+			<img src="img/xphome.jpg"/>
+			</div>
+			        <div class="item item-divider">Please choose your default campus:</div>
+
+
+        
+        <ul class="list">
+            <li><ion-radio ng-model="settings.campus" ng-value="'milpitas-cantonese'">Milpitas Cantonese 粵語</ion-radio></li>
+            <li><ion-radio ng-model="settings.campus" ng-value="'milpitas-mandarin'">Milpitas Mandarin 國語</ion-radio></li>
+            <li><ion-radio ng-model="settings.campus" ng-value="'trivalley-cantonese'">Pleasanton Cantonese 粵語</ion-radio></li>            
+    	</ul>
+
+        
+        <div class="padding">
+			<button ng-click="goHome()" class="button button-block xpblue_btn">
+			  Continue 繼續
+			</button>        
+		</div>
+
+    </ion-content>
+</ion-view>

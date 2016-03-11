@@ -1,0 +1,41 @@
+<ion-view title="昔日講道">
+    <ion-content  overflow-scroll="true" cache-view="false">
+        
+        {{storage}}
+
+        <div  ng-repeat="new in news">
+
+<!--
+        	<div ng-if="0==$index">
+            <a class="screen" href="#/app/feed-categories/{{new.series_title}}">
+                	<img ng-src="{{new.image}}" alt=""> 
+            </a>	
+            </div>
+-->
+            
+
+	<div ng-if="new.term.slug"  class="list card">
+             
+        			<div class="col " >
+								<a class="screen" href="#/app/series-sermons/{{news[$index].term.slug}}">
+								<img ng-src="{{news[$index].image}}" alt="">
+								</a>
+									
+								<div style="margin:4px;padding:4px">
+									<h4>{{new.term.description}}</h4>
+								</div>
+
+		<a class="button xpblue_btn" href="#/app/series-sermons/{{news[$index].term.slug}}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon ion-ios-play-outline"></i>重溫&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>								
+						</div>
+             
+</div>
+            
+
+
+		
+		
+		
+        </div>
+       
+    </ion-content>
+</ion-view>

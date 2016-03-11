@@ -1,0 +1,58 @@
+<ion-view title="{{sermon.title}}" class="xpbackground">
+<!--    <ion-nav-buttons side="right">
+    <a class="button button-clear" ng-click="shareSermon()"><i class="icon ion-ios-upload-outline"></i></a>
+    </ion-nav-buttons>
+-->
+	<ion-content  overflow-scroll="true" >
+	<div ng-if="sermon.youtubeURL" class="video-container" style="{{sermon}}">
+    <iframe ng-src="{{getSermonVideoUrl()}}" frameborder="0" ></iframe> 
+	</div>
+      
+
+	<div class="list card">
+
+	  <div ng-if="sermon.title" style="-webkit-user-select: auto;" data-tap-disabled=true  class="item">
+
+		<h2>{{sermon.title}}</h2>
+		<p>{{sermon.date}}. {{sermon.site_lang_slug}}<p>
+		<p>{{sermon.preacher}}</p> 
+		<p>Series: {{sermon.series_name}}</p>
+		<p><a class="button button-clear" ng-click="shareSermon()"><i class="icon ion-ios-upload-outline"></i> Share</a></p>
+	  </div>
+	
+	
+	<div  padding="10px;" ng-if="sermon.mp3path" class="item">
+		<div ng-if="isIOS()" >Audio:<p>
+	   		<audio padding="10px;" id="audio" ng-src="{{getSermonAudioUrl()}}" controls  ></audio>
+		</div>
+	
+	<!--
+		<div ng-if="!sermon.mp3path" class="item"><p>Sermon audio coming soon.</p>
+		</div>
+	-->
+
+		<div ng-if="isAndroid()" >Audio:<p>
+		<a class="button button-clear" ng-click="play()"><i class="icon ion-play" on-icon="ion-pause" off-icon="ion-play"></i></a>
+		<a class="button button-clear" ng-click="pause()"><i class="icon ion-pause" on-icon="ion-pause" off-icon="ion-pause"></i></a>
+		<a class="button button-clear" ng-click="stop()"><i class="icon ion-stop" on-icon="ion-stop" off-icon="ion-stop"></i></a>		
+		</div>
+		
+ 	</div>
+ 	
+
+	
+
+		<div ng-if="sermon.outline" class="item item-body">
+        	<p style="-webkit-user-select: auto;" data-tap-disabled=true ng-bind-html="sermon.outline"></p> 
+		</div>
+  
+
+	</div>  
+
+
+	
+
+    
+    </ion-content>
+    
+</ion-view>    

@@ -1,0 +1,26 @@
+<ion-view title="關於我們" class="xpbackground">
+
+
+
+
+
+    <ion-content  overflow-scroll="true">
+			<div class="screen">
+			<img src="img/xphome.jpg"/>
+			</div>
+	    	 <div  class="card padding" ng-repeat="item in about">  
+                    <p ng-bind-html="getContent($index)"></p> 
+            </div>
+			
+            <div ng-if="about" class="card ">
+		 		 <div class="item item-text-wrap item-avatar" ng-repeat="pastor in pastors">
+		  		  		 <img ng-src="{{pastor.src}}"> 
+		  		{{pastor.name}} {{pastor.nameEng}}	<p>
+		  		{{pastor.title}}<p>
+                <a class="xpblue" href="#/app/contact/{{pastor.nameEng}}"><i class="icon ion-ios-compose-outline"></i> Email</a>
+			</div>
+
+		</div>
+    	
+    </ion-content>
+</ion-view>

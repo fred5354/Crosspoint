@@ -1,0 +1,55 @@
+<ion-view title="昔日講道">
+    <ion-content  overflow-scroll="true" cache-view="false">
+        
+        {{storage}}
+        
+        <div  ng-repeat="new in news">
+        <!--
+        	<div ng-if="0==$index">
+            <a class="screen" href="#/app/feed-categories/{{new.series_title}}">
+                	<img ng-src="{{new.image}}" alt=""> 
+            </a>	
+            </div>
+        -->
+            
+            <!--
+             <ion-list>
+             
+              <a class="item " href="#/app/feed-categories/{{news[$index].series_slug}}" >
+              		<img style="width:80px;" ng-src="{{new.image}}" alt=""> 
+					{{new.series_title}}
+              </a>
+             
+             </ion-list>
+             -->
+            
+
+		   	<div ng-if="$index>=0">           
+		           <div  ng-if="$index%2==0" class="row">
+						<div class="col " style="margin:4px;padding:10px">
+								<a class="screen" href="#/app/series-sermons/{{news[$index].series_slug}}">
+								<img ng-src="{{news[$index].image}}" alt="">
+								</a><p>
+																					{{new.series_title}} 
+
+						</div>
+
+						<div class="col"  style="margin:4px;padding:10px">
+								<a class="screen" href="#/app/series-sermons/{{news[$index+1].series_slug}}">
+								<img ng-src="{{news[$index+1].image}}" alt=""> 
+								</a><p>
+													{{news[$index+1].series_title}}
+						</div>
+
+					</div> 	
+		            	
+		            	
+		    </div>
+
+		
+		
+		
+        </div>
+       
+    </ion-content>
+</ion-view>

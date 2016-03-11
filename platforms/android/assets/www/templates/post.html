@@ -5,11 +5,24 @@
     </ion-nav-buttons>
     
     <ion-content class="has-header">
+
         <div class="screen">
-			<img src="http://lorempixel.com/800/430/nature"/>
-			<div class="item item-text-wrap">
-				<h2>{{post.title}}</h2>
+        
+			<div ng-if="post.categories[0].slug == 'wordsofpastorchiu'" >
+				<img src="img/pchiu.jpg"/>
 			</div>
+			
+			<div ng-if="post.categories[0].slug == 'wordsofpastorfung'" >
+				<img src="img/pfung.jpg"/>
+			</div>				
+			
+			<div class="item item-text-wrap">
+					<h1>{{post.title}}</h1>
+					<h4>{{post.categories[0].title}}</h4>
+			</div>
+
+			
+			
 		</div>
 		
         <div class="padding">

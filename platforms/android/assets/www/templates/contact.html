@@ -1,18 +1,18 @@
 <ion-view title="Contact">
     <ion-nav-buttons side="right">
-            <div class="button button-calm" type="submit" ng-click="submitForm()"><i class="icon ion-ios-paperplane-outline"></i>Send Message</div>
+            <div class="button button-calm" type="submit" ng-click="submitForm()"><i class="icon ion-ios-paperplane-outline"></i> Send</div>
     </ion-nav-buttons>
     
     <ion-content class="has-header">
 
         <div class="list">
-            
+            <div style="color:#000000;" class="item">To: {{to}}</div>
             <label class="item item-input">
-            <input type="text" placeholder="Subject" ng-model="contact.subject">
+            <input type="text" placeholder="Enter your subject" ng-model="contact.subject">
             </label>
 
             <label class="item item-input">
-            <textarea class="multilinetextarea" placeholder="Message" ng-model="contact.body"></textarea>
+            <textarea class="multilinetextarea" placeholder="Enter your message" ng-model="contact.body"></textarea>
             </label>
 
             

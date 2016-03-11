@@ -3,6 +3,8 @@
     <head>
         
         <meta charset="utf-8">
+	    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *"> 
+        
         <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
         <title>Ionic Framework Bootstrap</title>
 
@@ -17,11 +19,12 @@
         <script src="lib/ionic/js/ionic.bundle.js"></script>
         <script src="js/angular-sanitize.js"></script>
 
-        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+      <!--  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> -->
         <script type="text/javascript" src="js/lodash.underscore.min.js"></script>
-        <script type="text/javascript" src="js/angular-google-maps.min.js"></script>
+      <!--  <script type="text/javascript" src="js/angular-google-maps.min.js"></script> -->
 
         <!-- Cordova Script (this will be a 404 during development) -->
+        <script src="js/ng-cordova.min.js"></script>        
         <script src="cordova.js"></script>
 
         <!-- Mobionic App's JS -->

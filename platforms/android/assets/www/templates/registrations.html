@@ -1,0 +1,36 @@
+<ion-view title="網上報名">
+    <ion-content class="has-header" >
+        
+        <ion-refresher
+        pulling-text="Pull to refresh..."
+        on-refresh="doRefresh()">
+        </ion-refresher>
+       
+        	<div class="screen">
+			<img src="img/registration.jpg"/>
+			</div>
+
+    
+			
+         <ion-list>
+
+            <a class="item" ng-class="{'item-thumbnail-left' : post.attachments.length}" href="#/app/registrations/{{$index}}" ng-repeat="post in posts">
+                <img ng-src="{{post.attachments[0].images.thumbnail.url}}" ng-show="{{post.attachments.length}}" alt="{{post.title}}">
+                
+                <h2 class="cool">{{post.title}}</h2>
+            <div class="item-icon-right">
+        <i class="icon ion-ios-arrow-right"></i>
+    </div>
+            </a>
+
+        </ion-list>
+        
+<!--        <div class="padding">
+        <button class="button button-block button-positive" ng-show="hasMoreItems()" ng-click="showMoreItems()" >
+        Load more
+        </button>
+        </div>
+-->
+   
+    </ion-content>
+</ion-view>

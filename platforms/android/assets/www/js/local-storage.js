@@ -1,6 +1,6 @@
 angular.module('mobionicApp.storage', [])
 
-.factory('NewsStorage', function() {
+.factory('SermonArchivesStorage', function() {
   return {
     all: function() {
       var news = window.localStorage['news'];
@@ -138,7 +138,8 @@ angular.module('mobionicApp.storage', [])
                name: 'Fifth Option',
                checked: false
             }],
-            sorting: 'A',
+            sorting: '',
+            campus: '',
             range:30
         };
     },

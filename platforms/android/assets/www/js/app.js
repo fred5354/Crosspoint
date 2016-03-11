@@ -3,12 +3,17 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'mobionicApp' is the name of this angular module (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.data', 'mobionicApp.directives', 'mobionicApp.filters', 'mobionicApp.storage', 'ngSanitize', 'uiGmapgoogle-maps'])
+//angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.data', 'mobionicApp.directives', 'mobionicApp.filters', 'mobionicApp.storage', 'ngSanitize', 'uiGmapgoogle-maps','ngCordova'])
+
+angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.data', 'mobionicApp.directives', 'mobionicApp.filters', 'mobionicApp.storage', 'ngSanitize', 'ngCordova'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
+    
+ 
+	
     if(window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
     }
@@ -24,11 +29,21 @@ angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.
         var $this = $(this); 
         var target = $this.data('inAppBrowser') || '_blank';
 
-        window.open($this.attr('href'), target);
+		var options = {
+		location: 'yes',
+		clearcache: 'yes',
+		toolbar: 'no'
+		};
+       //console.log($this.attr('href'));		
+        window.open($this.attr('href'), target,'location=yes');
 
     });
+    
+    $ionicPlatform.errMsg = "Opps.  Our servie is currently experience issues.  Please check back later.";
+    
 
     // Initialize Push Notifications
+    /*
     var initPushwoosh = function() {
         var pushNotification = window.plugins.pushNotification;
 
@@ -39,7 +54,7 @@ angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.
             registerPushwooshIOS();
         }
     }
-    
+    */
     // Uncomment the following initialization when you have made the appropriate configuration for iOS - http://goo.gl/YKQL8k and for Android - http://goo.gl/SPGWDJ
 	// initPushwoosh();
 
@@ -53,10 +68,13 @@ angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.
     // http://ionicframework.com/docs/api/provider/%24ionicConfigProvider/
     $ionicConfigProvider.tabs.position('bottom');
     $ionicConfigProvider.navBar.alignTitle('center');
-    $ionicConfigProvider.views.maxCache(5);
+    $ionicConfigProvider.views.maxCache(3);
+
+
 
     $stateProvider
-
+	
+		
     .state('app', {
       url: "/app",
       abstract: true,
@@ -64,32 +82,27 @@ angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.
       controller: 'AppCtrl'
     })
 
-    .state('app.home', {
+    .state('home', {
       url: "/home",
-      views: {
-        'menuContent' :{
-          templateUrl: "templates/posts.html",
-          //templateUrl: "templates/home-grid-3.html",
-          //templateUrl: "templates/home-rows.html",
-          controller: 'PostsCtrl'
-        }
-      }
+      template: "<p>hello world</p>"
     })
 
+
+
     .state('app.archive', {
-      url: "/news",
+      url: "/sermonArchives",
       views: {
-        'app-archive' :{
-          templateUrl: "templates/news.html",
-          controller: 'NewsCtrl'
+        'app-sermons' :{
+          templateUrl: "templates/sermonArchives.html",
+          controller: 'SermonArchivesCtrl'
         }
       }
     })
 
     .state('app.contact', {
-      url: "/contact",
+      url: "/contact/:to",
       views: {
-        'app-contact' :{
+        'app-about' :{
           templateUrl: "templates/contact.html",
           controller: 'ContactCtrl'
         }
@@ -107,6 +120,25 @@ angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.
       }
     })
 
+    .state('app.pastor-posts', {
+      url: "/pastor-posts",
+      views: {
+        'app-pastorposts' :{
+          templateUrl: "templates/pastor-posts.html",
+          controller: 'PostsCtrl'
+        }
+      }
+    })
+    
+    .state('app.pastor-post', {
+      url: "/posts/:postId",
+      views: {
+        'app-pastorposts' :{
+          templateUrl: "templates/post.html",
+          controller: 'PostCtrl'
+        }
+      }
+    })    
     
     .state('app.posts', {
       url: "/posts",
@@ -129,57 +161,74 @@ angular.module('mobionicApp', ['ionic', 'mobionicApp.controllers', 'mobionicApp.
     })    
 
   
-    .state('app.serverposts', {
-      url: "/serverposts",
+    .state('app.registrations', {
+      url: "/registrations",
       views: {
-        'app-feeds' :{
-          templateUrl: "templates/serverposts.html",
-          controller: 'ServerPostsCtrl'
+        'app-registrations' :{
+          templateUrl: "templates/registrations.html",
+          controller: 'RegistrationsCtrl'
         }
       }
     })
     
     
-       .state('app.serverpost', {
-      url: "/serverposts/:serverpostId",
+       .state('app.registration', {
+      url: "/registrations/:serverpostId",
       views: {
-        'app-feeds' :{
-          templateUrl: "templates/serverpost.html",
-          controller: 'ServerPostCtrl'
+        'app-registrations' :{
+          templateUrl: "templates/registration.html",
+          controller: 'RegistrationCtrl'
         }
       }
     })    
     
-    .state('app.feed-categories', {
-      url: "/feed-categories/:series_slug",
+    .state('app.series-sermons', {
+      url: "/series-sermons/:series_slug",
       views: {
-        'app-news' :{
-          templateUrl: "templates/feed-categories.html",
-          controller: 'FeedPluginCategoriesCtrl'
+        'app-sermons' :{
+          templateUrl: "templates/series-sermons.html",
+          controller: 'SeriesSermonsCtrl'
         }
       }
     })
 
-    .state('app.feed-category', {
-      url: "/feed-category/:id",
+    .state('app.series-campuses', {
+      url: "/series-campuses/:id",
       views: {
-        'app-news' :{
-          templateUrl: "templates/feed-category.html",
-          controller: 'FeedPluginCategoryCtrl'
+        'app-sermons' :{
+          templateUrl: "templates/series-campuses.html",
+          controller: 'SeriesCampusesCtrl'
         }
       }
     })
     
-    .state('app.feed-master', {
-      url: "/feed-master/:series_slug/:sermonPostID/:siteLangID",
+    .state('app.series-sermon', {
+      url: "/series-sermon/:series_slug/:sermonPostID/:siteLangID",
       views: {
-        'app-news' :{
-          templateUrl: "templates/feed-master.html",
-          controller: 'FeedPluginMasterCtrl'
+        'app-sermons' :{
+          templateUrl: "templates/series-sermon.html",
+          controller: 'SermonCtrl'
         }
       }
     })
   
+     .state('app.settings', {
+      url: "/settings",
+      views: {
+        'app-settings' :{
+          templateUrl: "templates/settings.html",
+          controller: 'SettingsCtrl'
+        }
+      }
+    }) 
+    
+     .state('firsttime', {
+	      url: "/firsttime",
+          templateUrl: "templates/firstTime.html",
+          controller: 'firstTimeCtrl'
+    })     
+    
+ 
 
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/posts');

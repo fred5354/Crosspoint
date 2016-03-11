@@ -1,5 +1,5 @@
 <ion-nav-bar class="bar-stable nav-title-slide-ios7">
- <ion-nav-back-button class="button-icon icon ion-ios-arrow-left"> Back</ion-nav-back-button>
+ <ion-nav-back-button class="button-icon icon ion-ios-arrow-left "> Back</ion-nav-back-button>
  </ion-nav-bar>
 <ion-view title="Crosspoint Church">
 
@@ -7,27 +7,43 @@
 
  	 <ion-tabs class="tabs-icon-top">
         
-        <ion-tab  nav-clear title="主頁" icon-on="ion-ios-home" icon-off="ion-ios-home-outline" href="#/app/posts">
+        <ion-tab  nav-clear title="匯報" icon-on="ion-ios-lightbulb xpblue" icon-off="ion-ios-lightbulb-outline" href="#/app/posts">
                   <ion-nav-view nav-clear name="app-posts"></ion-nav-view>
         </ion-tab>
+        
+        	<ion-tab title="牧者專欄" icon-on="ion-ios-person xpblue" icon-off="ion-ios-person-outline" href="#/app/pastor-posts">
+                                                    <ion-nav-view name="app-pastorposts"></ion-nav-view>
+            </ion-tab>
 
-            <ion-tab title="講道重溫" icon-on="ion-ios-play" icon-off="ion-ios-play-outline" href="#/app/feed-categories/newest">
-                              <ion-nav-view nav-clear name="app-news"></ion-nav-view>
+
+            <ion-tab title="講道重溫" icon-on="ion-ios-play xpblue" icon-off="ion-ios-play-outline " href="#/app/series-sermons/newest">
+                              <ion-nav-view nav-clear name="app-sermons"></ion-nav-view>
             </ion-tab>
 
 <!--
-            <ion-tab title="講道" icon-on="ion-ios-play" icon-off="ion-ios-play-outline" href="#/app/news">
-                                          <ion-nav-view nav-clear name="app-news"></ion-nav-view>
+            <ion-tab title="講道" icon-on="ion-ios-more" icon-off="ion-ios-more-outline" href="#/app/news">
+                                          <ion-nav-view nav-clear name="app-archive"></ion-nav-view>
             </ion-tab>
--->
+    -->
 
-            <ion-tab title="報名" icon-on="ion-ios-compose" icon-off="ion-ios-compose-outline" href="#/app/serverposts">
-          			  <ion-nav-view name="app-feeds"></ion-nav-view>
+
+            <ion-tab title="網上報名" icon-on="ion-ios-compose xpblue" icon-off="ion-ios-compose-outline" href="#/app/registrations">
+          			  <ion-nav-view name="app-registrations"></ion-nav-view>
             </ion-tab>
 
-          <ion-tab title="時間地點" icon-on="ion-ios-location" icon-off="ion-ios-location-outline" href="#/app/about">
+	
+	<!--		
+			
+          <ion-tab title="關於我們" icon-on="ion-ios-location xpblue" icon-off="ion-ios-location-outline" href="#/app/about">
                                                     <ion-nav-view name="app-about"></ion-nav-view>
             </ion-tab>
+    -->
+
+          <ion-tab title="設定" icon-on="ion-ios-gear xpblue" icon-off="ion-ios-gear-outline" href="#/app/settings">
+                                                    <ion-nav-view name="app-settings"></ion-nav-view>
+            </ion-tab>
+
+        
     
     <!--
             <ion-tab title="聯絡我們" icon-on="ion-ios-email" icon-off="ion-ios-email-outline" href="#/app/contact">
